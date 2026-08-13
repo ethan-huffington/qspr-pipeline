@@ -1,0 +1,33 @@
+# Python-generated files
+__pycache__/
+*.py[oc]
+build/
+dist/
+wheels/
+*.egg-info
+
+# Virtual environments
+.venv
+
+# Data and artifacts — keep the directory structure, never the contents.
+# The `!…/**/` lines re-include the directories themselves. Without them git
+# never descends into an excluded directory, so the .gitkeep rule cannot match
+# and nested directories like data/raw/ are lost on clone.
+data/**
+!data/**/
+!data/**/.gitkeep
+artifacts/**
+!artifacts/**/
+!artifacts/**/.gitkeep
+
+# Model checkpoints
+*.ckpt
+*.pt
+*.pth
+*.safetensors
+*.h5
+
+# Experiment tracking
+wandb/
+mlruns/
+lightning_logs/
