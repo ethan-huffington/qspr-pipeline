@@ -1,0 +1,24 @@
+# Smoke: the whole pipeline end to end in under a minute.
+#
+# This is what the test suite runs. Its job is not to produce meaningful numbers
+# but to keep every seam exercised on every commit, so integration bugs surface
+# while they are still cheap. Do not add a shortcut here that bypasses a stage.
+
+data:
+  max_molecules: 500
+
+splits:
+  n_outer: 2
+  n_inner: 2
+  # 500 molecules across 2 folds cannot honour the full-run minimum.
+  min_test_labels_per_property: 5
+
+tuning:
+  n_trials: 3
+
+models:
+  xgb_max_rounds: 50
+  xgb_early_stopping_rounds: 10
+  ensemble_seeds: 2
+  mtl_max_epochs: 20
+  mtl_patience: 5

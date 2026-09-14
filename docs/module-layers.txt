@@ -1,0 +1,38 @@
+dupont-qspr — internal module dependency layers
+(package __init__ re-export shims excluded; layer 0 imports nothing of ours)
+
+LAYER 0
+  contracts               ->  —
+  data.sources            ->  —
+  features.cache          ->  —
+  splits.scaffold         ->  —
+
+LAYER 1
+  config                  ->  contracts
+  data.download           ->  data.sources
+  data.standardize        ->  contracts
+
+LAYER 2
+  data.curate_mp          ->  data.standardize
+  data.union              ->  contracts, data.standardize
+  features.descriptors    ->  config, features.cache
+  features.encoders       ->  config, features.cache
+  skeleton                ->  config, contracts
+  splits.nested           ->  config, contracts, splits.scaffold
+  tracking                ->  config
+
+LAYER 3
+  data.build              ->  config, contracts, data.curate_mp, data.download, data.sources, data.standardize, data.union
+  spine                   ->  config, contracts, skeleton, tracking
+
+MOST DEPENDED-UPON
+   7  contracts
+   7  config
+   3  data.standardize
+   2  data.sources
+   2  features.cache
+   1  data.curate_mp
+   1  data.download
+   1  data.union
+
+LEAF CONSUMERS (nothing imports them): data.build, features.descriptors, features.encoders, spine, splits.nested

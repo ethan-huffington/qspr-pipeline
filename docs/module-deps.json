@@ -1,0 +1,298 @@
+{
+    "dupont_qspr": {
+        "bacon": 1,
+        "imported_by": [
+            "dupont_qspr",
+            "dupont_qspr.config",
+            "dupont_qspr.data",
+            "dupont_qspr.data.build",
+            "dupont_qspr.data.curate_mp",
+            "dupont_qspr.data.download",
+            "dupont_qspr.data.standardize",
+            "dupont_qspr.data.union",
+            "dupont_qspr.features",
+            "dupont_qspr.features.descriptors",
+            "dupont_qspr.features.encoders",
+            "dupont_qspr.skeleton",
+            "dupont_qspr.spine",
+            "dupont_qspr.splits",
+            "dupont_qspr.splits.nested",
+            "dupont_qspr.tracking"
+        ],
+        "imports": [
+            "dupont_qspr",
+            "dupont_qspr.config",
+            "dupont_qspr.spine"
+        ],
+        "name": "dupont_qspr",
+        "path": "/Users/ethanhuffington/Desktop/PROJECTS/dupont-qspr/src/dupont_qspr/__init__.py"
+    },
+    "dupont_qspr.config": {
+        "bacon": 1,
+        "imported_by": [
+            "dupont_qspr",
+            "dupont_qspr.data.build",
+            "dupont_qspr.features.descriptors",
+            "dupont_qspr.features.encoders",
+            "dupont_qspr.skeleton",
+            "dupont_qspr.spine",
+            "dupont_qspr.splits.nested",
+            "dupont_qspr.tracking"
+        ],
+        "imports": [
+            "dupont_qspr",
+            "dupont_qspr.contracts"
+        ],
+        "name": "dupont_qspr.config",
+        "path": "/Users/ethanhuffington/Desktop/PROJECTS/dupont-qspr/src/dupont_qspr/config.py"
+    },
+    "dupont_qspr.contracts": {
+        "bacon": 1,
+        "imported_by": [
+            "dupont_qspr.config",
+            "dupont_qspr.data.build",
+            "dupont_qspr.data.standardize",
+            "dupont_qspr.data.union",
+            "dupont_qspr.skeleton",
+            "dupont_qspr.spine",
+            "dupont_qspr.splits.nested"
+        ],
+        "name": "dupont_qspr.contracts",
+        "path": "/Users/ethanhuffington/Desktop/PROJECTS/dupont-qspr/src/dupont_qspr/contracts.py"
+    },
+    "dupont_qspr.data": {
+        "bacon": 1,
+        "imported_by": [
+            "dupont_qspr.data",
+            "dupont_qspr.data.build",
+            "dupont_qspr.data.curate_mp",
+            "dupont_qspr.data.download",
+            "dupont_qspr.data.union"
+        ],
+        "imports": [
+            "dupont_qspr",
+            "dupont_qspr.data",
+            "dupont_qspr.data.build",
+            "dupont_qspr.data.sources"
+        ],
+        "name": "dupont_qspr.data",
+        "path": "/Users/ethanhuffington/Desktop/PROJECTS/dupont-qspr/src/dupont_qspr/data/__init__.py"
+    },
+    "dupont_qspr.data.build": {
+        "bacon": 1,
+        "imported_by": [
+            "dupont_qspr.data"
+        ],
+        "imports": [
+            "dupont_qspr",
+            "dupont_qspr.config",
+            "dupont_qspr.contracts",
+            "dupont_qspr.data",
+            "dupont_qspr.data.curate_mp",
+            "dupont_qspr.data.download",
+            "dupont_qspr.data.sources",
+            "dupont_qspr.data.standardize",
+            "dupont_qspr.data.union"
+        ],
+        "name": "dupont_qspr.data.build",
+        "path": "/Users/ethanhuffington/Desktop/PROJECTS/dupont-qspr/src/dupont_qspr/data/build.py"
+    },
+    "dupont_qspr.data.curate_mp": {
+        "bacon": 1,
+        "imported_by": [
+            "dupont_qspr.data.build"
+        ],
+        "imports": [
+            "dupont_qspr",
+            "dupont_qspr.data",
+            "dupont_qspr.data.standardize"
+        ],
+        "name": "dupont_qspr.data.curate_mp",
+        "path": "/Users/ethanhuffington/Desktop/PROJECTS/dupont-qspr/src/dupont_qspr/data/curate_mp.py"
+    },
+    "dupont_qspr.data.download": {
+        "bacon": 1,
+        "imported_by": [
+            "dupont_qspr.data.build"
+        ],
+        "imports": [
+            "dupont_qspr",
+            "dupont_qspr.data",
+            "dupont_qspr.data.sources"
+        ],
+        "name": "dupont_qspr.data.download",
+        "path": "/Users/ethanhuffington/Desktop/PROJECTS/dupont-qspr/src/dupont_qspr/data/download.py"
+    },
+    "dupont_qspr.data.sources": {
+        "bacon": 1,
+        "imported_by": [
+            "dupont_qspr.data",
+            "dupont_qspr.data.build",
+            "dupont_qspr.data.download"
+        ],
+        "name": "dupont_qspr.data.sources",
+        "path": "/Users/ethanhuffington/Desktop/PROJECTS/dupont-qspr/src/dupont_qspr/data/sources.py"
+    },
+    "dupont_qspr.data.standardize": {
+        "bacon": 1,
+        "imported_by": [
+            "dupont_qspr.data.build",
+            "dupont_qspr.data.curate_mp",
+            "dupont_qspr.data.union"
+        ],
+        "imports": [
+            "dupont_qspr",
+            "dupont_qspr.contracts"
+        ],
+        "name": "dupont_qspr.data.standardize",
+        "path": "/Users/ethanhuffington/Desktop/PROJECTS/dupont-qspr/src/dupont_qspr/data/standardize.py"
+    },
+    "dupont_qspr.data.union": {
+        "bacon": 1,
+        "imported_by": [
+            "dupont_qspr.data.build"
+        ],
+        "imports": [
+            "dupont_qspr",
+            "dupont_qspr.contracts",
+            "dupont_qspr.data",
+            "dupont_qspr.data.standardize"
+        ],
+        "name": "dupont_qspr.data.union",
+        "path": "/Users/ethanhuffington/Desktop/PROJECTS/dupont-qspr/src/dupont_qspr/data/union.py"
+    },
+    "dupont_qspr.features": {
+        "bacon": 1,
+        "imported_by": [
+            "dupont_qspr.features",
+            "dupont_qspr.features.descriptors",
+            "dupont_qspr.features.encoders"
+        ],
+        "imports": [
+            "dupont_qspr",
+            "dupont_qspr.features",
+            "dupont_qspr.features.cache",
+            "dupont_qspr.features.descriptors",
+            "dupont_qspr.features.encoders"
+        ],
+        "name": "dupont_qspr.features",
+        "path": "/Users/ethanhuffington/Desktop/PROJECTS/dupont-qspr/src/dupont_qspr/features/__init__.py"
+    },
+    "dupont_qspr.features.cache": {
+        "bacon": 1,
+        "imported_by": [
+            "dupont_qspr.features",
+            "dupont_qspr.features.descriptors",
+            "dupont_qspr.features.encoders"
+        ],
+        "name": "dupont_qspr.features.cache",
+        "path": "/Users/ethanhuffington/Desktop/PROJECTS/dupont-qspr/src/dupont_qspr/features/cache.py"
+    },
+    "dupont_qspr.features.descriptors": {
+        "bacon": 1,
+        "imported_by": [
+            "dupont_qspr.features"
+        ],
+        "imports": [
+            "dupont_qspr",
+            "dupont_qspr.config",
+            "dupont_qspr.features",
+            "dupont_qspr.features.cache"
+        ],
+        "name": "dupont_qspr.features.descriptors",
+        "path": "/Users/ethanhuffington/Desktop/PROJECTS/dupont-qspr/src/dupont_qspr/features/descriptors.py"
+    },
+    "dupont_qspr.features.encoders": {
+        "bacon": 1,
+        "imported_by": [
+            "dupont_qspr.features"
+        ],
+        "imports": [
+            "dupont_qspr",
+            "dupont_qspr.config",
+            "dupont_qspr.features",
+            "dupont_qspr.features.cache"
+        ],
+        "name": "dupont_qspr.features.encoders",
+        "path": "/Users/ethanhuffington/Desktop/PROJECTS/dupont-qspr/src/dupont_qspr/features/encoders.py"
+    },
+    "dupont_qspr.skeleton": {
+        "bacon": 1,
+        "imported_by": [
+            "dupont_qspr.spine"
+        ],
+        "imports": [
+            "dupont_qspr",
+            "dupont_qspr.config",
+            "dupont_qspr.contracts"
+        ],
+        "name": "dupont_qspr.skeleton",
+        "path": "/Users/ethanhuffington/Desktop/PROJECTS/dupont-qspr/src/dupont_qspr/skeleton.py"
+    },
+    "dupont_qspr.spine": {
+        "bacon": 1,
+        "imported_by": [
+            "dupont_qspr"
+        ],
+        "imports": [
+            "dupont_qspr",
+            "dupont_qspr.config",
+            "dupont_qspr.contracts",
+            "dupont_qspr.skeleton",
+            "dupont_qspr.tracking"
+        ],
+        "name": "dupont_qspr.spine",
+        "path": "/Users/ethanhuffington/Desktop/PROJECTS/dupont-qspr/src/dupont_qspr/spine.py"
+    },
+    "dupont_qspr.splits": {
+        "bacon": 1,
+        "imported_by": [
+            "dupont_qspr.splits",
+            "dupont_qspr.splits.nested"
+        ],
+        "imports": [
+            "dupont_qspr",
+            "dupont_qspr.splits",
+            "dupont_qspr.splits.nested",
+            "dupont_qspr.splits.scaffold"
+        ],
+        "name": "dupont_qspr.splits",
+        "path": "/Users/ethanhuffington/Desktop/PROJECTS/dupont-qspr/src/dupont_qspr/splits/__init__.py"
+    },
+    "dupont_qspr.splits.nested": {
+        "bacon": 1,
+        "imported_by": [
+            "dupont_qspr.splits"
+        ],
+        "imports": [
+            "dupont_qspr",
+            "dupont_qspr.config",
+            "dupont_qspr.contracts",
+            "dupont_qspr.splits",
+            "dupont_qspr.splits.scaffold"
+        ],
+        "name": "dupont_qspr.splits.nested",
+        "path": "/Users/ethanhuffington/Desktop/PROJECTS/dupont-qspr/src/dupont_qspr/splits/nested.py"
+    },
+    "dupont_qspr.splits.scaffold": {
+        "bacon": 1,
+        "imported_by": [
+            "dupont_qspr.splits",
+            "dupont_qspr.splits.nested"
+        ],
+        "name": "dupont_qspr.splits.scaffold",
+        "path": "/Users/ethanhuffington/Desktop/PROJECTS/dupont-qspr/src/dupont_qspr/splits/scaffold.py"
+    },
+    "dupont_qspr.tracking": {
+        "bacon": 1,
+        "imported_by": [
+            "dupont_qspr.spine"
+        ],
+        "imports": [
+            "dupont_qspr",
+            "dupont_qspr.config"
+        ],
+        "name": "dupont_qspr.tracking",
+        "path": "/Users/ethanhuffington/Desktop/PROJECTS/dupont-qspr/src/dupont_qspr/tracking.py"
+    }
+}

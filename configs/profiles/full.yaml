@@ -1,0 +1,14 @@
+# Full: the profile whose numbers get reported.
+#
+# Sized for the M4 Mac mini (10 cores). The XGBoost nested run is
+# 5 outer x (100 trials x 3 inner + 1 refit) x 3 properties, which is the long
+# pole at roughly a few hours; Optuna pruning cuts a good fraction of that. The
+# neural track is minutes, since it fits small heads on cached embeddings.
+
+tuning:
+  # Sized from measured fit times (logS ~6s, logP ~4s, mp_K ~21s) rather than
+  # guessed. 50 trials x 3 inner folds x 3 properties x 5 outer folds, with
+  # pruning cutting roughly a third of the inner fits, lands near 3 hours.
+  # 100 trials would be ~6 hours for a search that has long since converged.
+  n_trials: 50
+  pruning: true

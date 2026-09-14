@@ -1,0 +1,83 @@
+# Defaults shared by every profile. Profiles under configs/profiles/ overlay only
+# what they change; the merge is recursive. Unknown keys are a load-time error.
+
+seed: 20260813
+
+data:
+  # "full" is the full curated Bradley set (~20k). "double_plus_good" is the
+  # high-purity subset (~3k) kept only where replicates agree closely.
+  bradley_subset: full
+  mp_conflict_tolerance_k: 5.0
+  # Physical plausibility windows, in storage units. Violations are excluded and
+  # written to the curation ledger rather than dropped silently.
+  ranges:
+    logS: [-13.0, 2.0]
+    logP: [-5.0, 10.0]
+    mp_K: [100.0, 750.0]
+  # Second-largest fragment at or above this share of the largest means the entry
+  # is a mixture, not a salt: reject rather than silently keep the biggest piece.
+  mixture_fragment_ratio: 0.5
+  keep_stereochemistry: true
+  # AqSolDB legitimately contains inorganic salts, so this stays off.
+  require_carbon: false
+  max_molecules: null
+
+features:
+  use_rdkit_descriptors: true
+  ecfp_radius: 2
+  ecfp_bits: 1024
+  # MLM rather than -77M-MTR: the MTR checkpoint was pretrained on computed RDKit
+  # descriptors including a logP-like target, which would flatter the logP task.
+  # Two frozen encoders are cached, not one. ChemBERTa-2's published tokenizer has
+  # zero BPE merge rules, so it reads Cl as C and Br as B and drops stereochemistry
+  # — and it was pretrained that way, so it cannot be fixed. 31% of our molecules
+  # carry a halogen (43% of the logP set) and the descriptor track sees them fine,
+  # so running only ChemBERTa-2 would confound the step-7 track comparison.
+  encoders:
+    chemberta2: DeepChem/ChemBERTa-77M-MLM        # brief's choice; 77M corpus, broken tokenizer
+    pubchem10m: seyonec/PubChem10M_SMILES_BPE_450k # 10M corpus, working tokenizer
+  primary_encoder: pubchem10m
+  # 256 measured fastest on the M4 (~1,750 mol/s on MPS vs ~1,585 on CPU at 64).
+  # Batch size cannot change the embeddings: mean pooling masks padding, so a
+  # molecule's vector does not depend on what it was batched with.
+  chemberta_batch_size: 256
+  chemberta_pooling: mean
+  device: auto
+  version: v1
+
+splits:
+  n_outer: 5
+  n_inner: 3
+  min_test_labels_per_property: 30
+  generic_scaffolds: false
+  # 15% of molecules are acyclic and have no scaffold. "shared" would put all
+  # 4,471 in one group carrying 27% of logS labels but 0.1% of logP labels.
+  acyclic_policy: singleton
+
+tuning:
+  n_trials: 50
+  pruning: true
+  timeout_s: null
+
+models:
+  xgb_n_jobs: 10
+  # Measured on the melting-point set (9,678 rows x 1,241 features): 2,000 rounds
+  # takes 29.5s and reaches RMSE 41.53; 800 rounds takes 21.6s for RMSE 41.53.
+  # The extra 1,200 trees buy nothing, so the cap is the cheaper one.
+  xgb_max_rounds: 800
+  xgb_early_stopping_rounds: 50
+  ensemble_seeds: 5
+  mtl_max_epochs: 200
+  mtl_patience: 20
+
+uncertainty:
+  nominal_coverage: 0.9
+  quantiles: [0.05, 0.5, 0.95]
+  # Read off the error-vs-distance curve in step 9. Never guessed.
+  ad_threshold: null
+  ad_bands: [0.2, 0.35, 0.5, 0.65, 1.0]
+
+tracking:
+  backend: jsonl
+  experiment: dupont-qspr
+  uri: null

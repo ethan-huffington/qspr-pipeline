@@ -1,0 +1,11 @@
+# Dev: the working loop. Full data and the real fold geometry, but a shallow
+# hyperparameter search, so a nested run finishes in minutes rather than hours.
+# Numbers from this profile are directional and must not be reported.
+
+tuning:
+  # ~25 minutes on full data. Directional only: enough trials to exercise the
+  # search, not enough to trust the winner.
+  n_trials: 8
+
+models:
+  ensemble_seeds: 3

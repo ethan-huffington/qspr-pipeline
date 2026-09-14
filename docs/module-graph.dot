@@ -1,0 +1,52 @@
+
+digraph G {
+    concentrate = true;
+
+    rankdir = BT;
+    node [style=filled,fillcolor="#ffffff",fontcolor="#000000",fontname=Helvetica,fontsize=10];
+
+    dupont_qspr_config [fillcolor="#f90606",fontcolor="#ffffff",label="config"];
+    dupont_qspr_contracts [fillcolor="#f91010",fontcolor="#ffffff",label="contracts"];
+    dupont_qspr_data_build [fillcolor="#7e4444",fontcolor="#ffffff",label="data.build"];
+    dupont_qspr_data_curate_mp [fillcolor="#b34c4c",fontcolor="#ffffff",label="data.curate_mp"];
+    dupont_qspr_data_download [fillcolor="#b34c4c",fontcolor="#ffffff",label="data.download"];
+    dupont_qspr_data_sources [fillcolor="#c24747",fontcolor="#ffffff",label="data.sources"];
+    dupont_qspr_data_standardize [fillcolor="#cc3333",fontcolor="#ffffff",label="data\.\nstandardize"];
+    dupont_qspr_data_union [fillcolor="#ac4949",fontcolor="#ffffff",label="data.union"];
+    dupont_qspr_features_cache [fillcolor="#c24747",fontcolor="#ffffff",label="features.cache"];
+    dupont_qspr_features_descriptors [fillcolor="#9f5656",fontcolor="#ffffff",label="features\.\ndescriptors"];
+    dupont_qspr_features_encoders [fillcolor="#9f5656",fontcolor="#ffffff",label="features\.\nencoders"];
+    dupont_qspr_skeleton [fillcolor="#ac4949",fontcolor="#ffffff",label="skeleton"];
+    dupont_qspr_spine [fillcolor="#924e4e",fontcolor="#ffffff",label="spine"];
+    dupont_qspr_splits_nested [fillcolor="#995252",fontcolor="#ffffff",label="splits.nested"];
+    dupont_qspr_splits_scaffold [fillcolor="#b65353",fontcolor="#ffffff",label="splits\.\nscaffold"];
+    dupont_qspr_tracking [fillcolor="#b34c4c",fontcolor="#ffffff",label="tracking"];
+    dupont_qspr_data_build -> dupont_qspr_config [fillcolor="#7e4444",minlen="2"];
+    dupont_qspr_features_descriptors -> dupont_qspr_config [fillcolor="#9f5656",minlen="2"];
+    dupont_qspr_features_encoders -> dupont_qspr_config [fillcolor="#9f5656",minlen="2"];
+    dupont_qspr_skeleton -> dupont_qspr_config [fillcolor="#ac4949"];
+    dupont_qspr_spine -> dupont_qspr_config [fillcolor="#924e4e"];
+    dupont_qspr_splits_nested -> dupont_qspr_config [fillcolor="#995252",minlen="2"];
+    dupont_qspr_tracking -> dupont_qspr_config [fillcolor="#b34c4c"];
+    dupont_qspr_config -> dupont_qspr_contracts [fillcolor="#f90606"];
+    dupont_qspr_data_build -> dupont_qspr_contracts [fillcolor="#7e4444",minlen="2"];
+    dupont_qspr_data_standardize -> dupont_qspr_contracts [fillcolor="#cc3333",minlen="2"];
+    dupont_qspr_data_union -> dupont_qspr_contracts [fillcolor="#ac4949",minlen="2"];
+    dupont_qspr_skeleton -> dupont_qspr_contracts [fillcolor="#ac4949"];
+    dupont_qspr_spine -> dupont_qspr_contracts [fillcolor="#924e4e"];
+    dupont_qspr_splits_nested -> dupont_qspr_contracts [fillcolor="#995252",minlen="2"];
+    dupont_qspr_data_build -> dupont_qspr_data_curate_mp [fillcolor="#7e4444",weight="2"];
+    dupont_qspr_data_build -> dupont_qspr_data_download [fillcolor="#7e4444",weight="2"];
+    dupont_qspr_data_build -> dupont_qspr_data_sources [fillcolor="#7e4444",weight="2"];
+    dupont_qspr_data_download -> dupont_qspr_data_sources [fillcolor="#b34c4c",weight="2"];
+    dupont_qspr_data_build -> dupont_qspr_data_standardize [fillcolor="#7e4444",weight="2"];
+    dupont_qspr_data_curate_mp -> dupont_qspr_data_standardize [fillcolor="#b34c4c",weight="2"];
+    dupont_qspr_data_union -> dupont_qspr_data_standardize [fillcolor="#ac4949",weight="2"];
+    dupont_qspr_data_build -> dupont_qspr_data_union [fillcolor="#7e4444",weight="2"];
+    dupont_qspr_features_descriptors -> dupont_qspr_features_cache [fillcolor="#9f5656",weight="2"];
+    dupont_qspr_features_encoders -> dupont_qspr_features_cache [fillcolor="#9f5656",weight="2"];
+    dupont_qspr_spine -> dupont_qspr_skeleton [fillcolor="#924e4e"];
+    dupont_qspr_splits_nested -> dupont_qspr_splits_scaffold [fillcolor="#995252",weight="2"];
+    dupont_qspr_spine -> dupont_qspr_tracking [fillcolor="#924e4e"];
+}
+
