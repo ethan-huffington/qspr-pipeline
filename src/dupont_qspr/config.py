@@ -23,6 +23,7 @@ from pydantic import BaseModel, ConfigDict, Field, model_validator
 from dupont_qspr.contracts import PROPERTIES, PropertyName
 
 __all__ = [
+    "AblationConfig",
     "Config",
     "DataConfig",
     "FeatureConfig",
@@ -218,6 +219,11 @@ class UncertaintyConfig(_Base):
     #: Distance bands used for the conditional-coverage diagnostic.
     ad_bands: tuple[float, ...] = (0.2, 0.35, 0.5, 0.65, 1.0)
 
+    #: The applicability-domain threshold is the distance at which normalised error
+    #: first exceeds this multiple of the error among the nearer half of molecules.
+    #: Read off the error-versus-distance curve at step 9, never guessed.
+    ad_error_tolerance: float = 1.5
+
     @model_validator(mode="after")
     def _check_coverage(self) -> UncertaintyConfig:
         if not 0.0 < self.nominal_coverage < 1.0:
@@ -233,6 +239,22 @@ class UncertaintyConfig(_Base):
                 f"({expected}, {round(1.0 - expected, 6)})"
             )
         return self
+
+
+class AblationConfig(_Base):
+    """The low-data experiment: how each track degrades as labels become scarce.
+
+    Deliberately lean - fixed default hyperparameters rather than a nested search
+    at every size - so it costs minutes. The question is the *shape* of the curves
+    (does multi-task help most when data is scarce?), not the best number at each
+    size, and a fixed configuration keeps that comparison clean.
+    """
+
+    sizes: tuple[int, ...] = (100, 250, 500, 1000)
+    seeds: int = 3
+    #: Share of each subsample held back for early stopping, so neither track
+    #: ever validates against the outer test fold.
+    holdout_fraction: float = 0.2
 
 
 class TrackingConfig(_Base):
@@ -265,6 +287,7 @@ class Config(_Base):
     models: ModelConfig = Field(default_factory=ModelConfig)
     uncertainty: UncertaintyConfig = Field(default_factory=UncertaintyConfig)
     tracking: TrackingConfig = Field(default_factory=TrackingConfig)
+    ablation: AblationConfig = Field(default_factory=AblationConfig)
 
     # Paths are derived, not configured, so the layout stays consistent.
     @property

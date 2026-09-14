@@ -8,7 +8,7 @@ the commands below after adding or moving a module.
 | File | What it is |
 |---|---|
 | `module-graph.svg` | The one to look at. Implementation modules only. |
-| `module-graph-full.svg` | Same, plus the four package `__init__` re-export shims. |
+| `module-graph-full.svg` | Same, plus the package `__init__` re-export shims. |
 | `module-graph.dot` | Graphviz source for `module-graph.svg`. |
 | `module-deps.json` | Raw dependency data, for scripting. |
 | `module-layers.txt` | Text view, layered by dependency depth. |
@@ -26,7 +26,9 @@ dev dependency.
 ```sh
 uv run pydeps src/dupont_qspr \
     --only dupont_qspr --max-bacon 0 --reverse \
-    --exclude-exact dupont_qspr dupont_qspr.data dupont_qspr.features dupont_qspr.splits \
+    --exclude-exact dupont_qspr dupont_qspr.analysis dupont_qspr.data dupont_qspr.features \
+        dupont_qspr.metrics dupont_qspr.models dupont_qspr.reporting dupont_qspr.serving \
+        dupont_qspr.splits dupont_qspr.tuning dupont_qspr.uncertainty \
     --rmprefix dupont_qspr. --noshow --no-config \
     -T svg -o docs/module-graph.svg
 ```
@@ -43,28 +45,36 @@ Flag by flag:
 - `--noshow` — don't open a viewer
 - `--no-config` — ignore any user-level `.pydeps` file, so output is reproducible
 
-Drop `--exclude-exact` for `module-graph-full.svg`.
+Drop `--exclude-exact` for `module-graph-full.svg`. Append `--show-dot --no-output`
+(redirected to `module-graph.dot`) or `--show-deps --no-output` (to
+`module-deps.json`) for the other two files. zsh does not word-split an unquoted
+variable, so write the module list out rather than storing it in one.
 
 ### What the graph should show
 
-Four layers, no cycles.
+Five layers, no cycles. Full listing in `module-layers.txt`.
 
 ```
-layer 0   contracts · data.sources · features.cache · splits.scaffold
-layer 1   config · data.download · data.standardize
-layer 2   data.curate_mp · data.union · features.descriptors · features.encoders
-          skeleton · splits.nested · tracking
-layer 3   data.build · spine
+layer 0   contracts · data.sources · features.cache · metrics.point · splits.scaffold
+          tuning.spaces · uncertainty.applicability · uncertainty.conformal
+layer 1   config · data.download · data.standardize · metrics.baselines
+          models.mtl · models.xgb · reporting.figures
+layer 2   analysis.* · data.curate_mp · data.union · dataset · features.*
+          models.ensemble · reporting.load · reporting.tables · splits.nested · tracking
+layer 3   analysis.ablation · data.build · serving.scorer · tuning.nested_*
+layer 4   serving.final_fit · serving.pyfunc
 ```
 
-`contracts` sitting at layer 0 with nothing beneath it, and seven modules above
-depending on it, is the design working as intended: the interfaces depend on
-nothing and everything depends on the interfaces. If `contracts` ever acquires an
-outgoing edge, something has leaked an implementation detail into the seam.
+`contracts` at layer 0, depended on by 19 modules, is the design working as
+intended: the interfaces depend on nothing and everything depends on the
+interfaces. If `contracts` ever acquires an outgoing edge, something has leaked an
+implementation detail into the seam.
 
-### Known limitation
+### Reading it with the OpenMP constraint in mind
 
-pydeps analyses imports statically, so it misses imports written inside
-functions. There is one in this codebase: `dupont_qspr/__init__.py` imports
-`spine` inside `main()`, to keep `import dupont_qspr` cheap. That edge appears in
-no pydeps output.
+pydeps follows imports written inside functions too, so `serving.scorer` shows
+edges to **both** `models.xgb` and `models.mtl`. That is correct as a dependency
+graph, but it does not mean both load at runtime. Each import sits inside the code
+path for its own family, which is how one module serves either family without
+XGBoost and PyTorch ever sharing a process. The same applies to
+`analysis.ablation`.

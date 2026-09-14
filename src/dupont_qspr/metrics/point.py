@@ -32,6 +32,7 @@ import numpy.typing as npt
 from scipy import stats
 
 __all__ = [
+    "enrichment_factor",
     "fold_interval",
     "mae",
     "point_metrics",
@@ -89,27 +90,64 @@ def point_metrics(y_true: Array, y_pred: Array, *, train_sd: float) -> dict[str,
     }
 
 
-def tail_spearman(y_true: Array, y_pred: Array, *, quantile: float = 0.9) -> float:
-    """Rank correlation restricted to the top slice of true values.
+def tail_spearman(
+    y_true: Array,
+    y_pred: Array,
+    *,
+    quantile: float = 0.9,
+    tail: str = "upper",
+) -> float:
+    """Rank correlation restricted to one tail of the true values.
 
-    Brief §10 singles this out: "pay particular attention to ranking quality in
-    the high-value tail". The reason is that overall Spearman is dominated by the
-    bulk, where most molecules sit and ranking is easy. A model can score 0.89
-    overall while scrambling the extremes - and the extremes are the only part a
-    downstream optimiser actually looks at, because it is selecting the best
-    candidates, not the median ones.
+    ``tail="upper"`` keeps the top slice, ``"lower"`` the bottom one. Both are
+    reported because which end is "high value" depends on the consumer's objective
+    - maximise solubility, but hold melting point inside a processing window - and
+    the predictor does not get to assume it.
 
-    Which end is "high value" is property-dependent (most soluble, most lipophilic,
-    highest melting) so this always takes the upper tail and the interpretation is
-    left to the reader.
+    Read this alongside :func:`enrichment_factor`. Restricting to a narrow slice
+    shrinks the spread of true values while leaving model noise unchanged, so the
+    correlation is attenuated even for an unchanged model (restriction of range).
     """
     if y_true.size < 10:
         return float("nan")
-    threshold = float(np.quantile(y_true, quantile))
-    keep = y_true >= threshold
+    if tail == "upper":
+        keep = y_true >= float(np.quantile(y_true, quantile))
+    elif tail == "lower":
+        keep = y_true <= float(np.quantile(y_true, 1.0 - quantile))
+    else:
+        raise ValueError(f"tail must be 'upper' or 'lower', got {tail!r}")
     if keep.sum() < 3:
         return float("nan")
     return spearman(y_true[keep], y_pred[keep])
+
+
+def enrichment_factor(
+    y_true: Array,
+    y_pred: Array,
+    *,
+    fraction: float = 0.1,
+    tail: str = "upper",
+) -> float:
+    """How many more true extremes land in the model's top picks than chance would.
+
+    The "actives" are the molecules whose *true* value is in the chosen tail; the
+    selection is the same number of molecules the model *ranks* into that tail::
+
+        EF = (hits / selected) / (actives / total)
+
+    1.0 is random picking; the ceiling is ``1 / fraction`` (10 at 10%). Unlike tail
+    Spearman it ranks against the full list and never subsets, so it does not
+    suffer restriction of range - which is why virtual screening uses it.
+    """
+    n = y_true.size
+    k = round(n * fraction)
+    if n < 10 or k < 1:
+        return float("nan")
+    sign = 1.0 if tail == "upper" else -1.0
+    actives = np.argsort(-sign * y_true, kind="stable")[:k]
+    selected = np.argsort(-sign * y_pred, kind="stable")[:k]
+    hits = np.intersect1d(actives, selected).size
+    return (hits / k) / (k / n)
 
 
 def fold_interval(

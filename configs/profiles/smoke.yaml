@@ -22,3 +22,8 @@ models:
   ensemble_seeds: 2
   mtl_max_epochs: 20
   mtl_patience: 5
+
+ablation:
+  # 500 molecules over 2 folds leaves ~36 lipophilicity labels per training fold.
+  sizes: [15, 30]
+  seeds: 2

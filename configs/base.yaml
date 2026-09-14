@@ -76,6 +76,14 @@ uncertainty:
   # Read off the error-vs-distance curve in step 9. Never guessed.
   ad_threshold: null
   ad_bands: [0.2, 0.35, 0.5, 0.65, 1.0]
+  # AD threshold = first distance where normalised error exceeds this x the near-half error.
+  ad_error_tolerance: 1.5
+
+ablation:
+  # Lean: fixed default hyperparameters, subsampled labels per property.
+  sizes: [100, 250, 500, 1000]
+  seeds: 3
+  holdout_fraction: 0.2
 
 tracking:
   backend: jsonl

@@ -1,15 +1,17 @@
 """Multi-property small-molecule QSPR oracle.
 
-Predicts aqueous solubility, lipophilicity, and melting point from SMILES, each
-with a calibrated uncertainty interval and an applicability-domain flag.
+Predicts aqueous solubility, lipophilicity and melting point from SMILES, each with
+a calibrated prediction interval and an applicability-domain flag.
 
-See ``qspr_project_brief.md`` for the design and ``dupont_qspr.contracts`` for the
-interfaces the pipeline stages meet at.
+See ``qspr_project_brief.md`` for the design, ``dupont_qspr.contracts`` for the
+interfaces the pipeline stages meet at, and ``experiments/run_pipeline.sh`` for the
+order the stages run in.
 """
 
 from __future__ import annotations
 
 import argparse
+import json
 
 from dupont_qspr.config import Config, load_config
 
@@ -17,25 +19,26 @@ __all__ = ["Config", "load_config", "main"]
 
 
 def main() -> None:
-    """Entry point for ``uv run dupont-qspr``.
-
-    Until the real pipeline stages land this runs the skeleton spine, which walks
-    every stage end to end on synthetic data.
-    """
-    parser = argparse.ArgumentParser(prog="dupont-qspr", description=__doc__)
-    parser.add_argument(
-        "--profile",
-        default="smoke",
-        choices=("smoke", "dev", "full"),
-        help="runtime profile: data size, fold counts, tuning budget",
+    """``uv run dupont-qspr CCO c1ccccc1O`` scores SMILES with the built bundle."""
+    parser = argparse.ArgumentParser(
+        prog="dupont-qspr", description="Score SMILES with the final model bundle."
     )
+    parser.add_argument("smiles", nargs="*", help="SMILES strings to score")
+    parser.add_argument("--profile", default="full", choices=("smoke", "dev", "full"))
     args = parser.parse_args()
 
-    from dupont_qspr.spine import run_spine, summary_table
+    if not args.smiles:
+        parser.print_help()
+        print("\nBuild everything first with: experiments/run_pipeline.sh <profile>")
+        return
 
-    cfg = load_config(args.profile)
-    summary = run_spine(cfg)
+    bundle = load_config(args.profile).artifacts_dir / "final" / "bundle"
+    if not bundle.exists():
+        raise SystemExit(
+            f"no bundle at {bundle}; run experiments/11_final_fit.py --profile {args.profile}"
+        )
 
-    print(f"profile={cfg.profile}  elapsed={summary['elapsed_s']:.2f}s")
-    print(f"labels: {summary['label_availability']['per_property']}")
-    print(summary_table(summary))
+    from dupont_qspr.serving.scorer import QSPRScorer
+
+    for record in QSPRScorer.load(bundle).score(args.smiles):
+        print(json.dumps(record, indent=2))

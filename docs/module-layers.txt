@@ -2,37 +2,54 @@ dupont-qspr — internal module dependency layers
 (package __init__ re-export shims excluded; layer 0 imports nothing of ours)
 
 LAYER 0
-  contracts               ->  —
-  data.sources            ->  —
-  features.cache          ->  —
-  splits.scaffold         ->  —
+  contracts                   ->  —
+  data.sources                ->  —
+  features.cache              ->  —
+  metrics.point               ->  —
+  splits.scaffold             ->  —
+  tuning.spaces               ->  —
+  uncertainty.applicability   ->  —
+  uncertainty.conformal       ->  —
 
 LAYER 1
-  config                  ->  contracts
-  data.download           ->  data.sources
-  data.standardize        ->  contracts
+  config                      ->  contracts
+  data.download               ->  data.sources
+  data.standardize            ->  contracts
+  metrics.baselines           ->  metrics.point
+  models.mtl                  ->  contracts
+  models.xgb                  ->  contracts
+  reporting.figures           ->  contracts
 
 LAYER 2
-  data.curate_mp          ->  data.standardize
-  data.union              ->  contracts, data.standardize
-  features.descriptors    ->  config, features.cache
-  features.encoders       ->  config, features.cache
-  skeleton                ->  config, contracts
-  splits.nested           ->  config, contracts, splits.scaffold
-  tracking                ->  config
+  analysis.comparison         ->  config, contracts, metrics.point
+  analysis.coverage           ->  config, contracts
+  analysis.figures            ->  contracts, reporting.figures
+  data.curate_mp              ->  data.standardize
+  data.union                  ->  contracts, data.standardize
+  dataset                     ->  config, contracts
+  features.descriptors        ->  config, features.cache
+  features.encoders           ->  config, features.cache
+  models.ensemble             ->  contracts, models.mtl
+  reporting.load              ->  config
+  reporting.tables            ->  contracts, metrics.baselines, metrics.point
+  splits.nested               ->  config, contracts, splits.scaffold
+  tracking                    ->  config
 
 LAYER 3
-  data.build              ->  config, contracts, data.curate_mp, data.download, data.sources, data.standardize, data.union
-  spine                   ->  config, contracts, skeleton, tracking
+  analysis.ablation           ->  config, contracts, dataset, metrics.point, models.mtl, models.xgb
+  data.build                  ->  config, contracts, data.curate_mp, data.download, data.sources, data.standardize, data.union
+  serving.scorer              ->  contracts, data.standardize, features.descriptors, features.encoders, models.ensemble, models.mtl, models.xgb, uncertainty.applicability
+  tuning.nested_mtl           ->  config, contracts, dataset, metrics.point, models.mtl, tracking, tuning.spaces
+  tuning.nested_run           ->  config, contracts, dataset, metrics.point, models.xgb, tracking, tuning.spaces
+
+LAYER 4
+  serving.final_fit           ->  config, contracts, dataset, features.descriptors, metrics.point, models.ensemble, models.xgb, serving.scorer, tracking, tuning.nested_mtl, tuning.spaces, uncertainty.conformal
+  serving.pyfunc              ->  config, serving.scorer
 
 MOST DEPENDED-UPON
-   7  contracts
-   7  config
-   3  data.standardize
-   2  data.sources
-   2  features.cache
-   1  data.curate_mp
-   1  data.download
-   1  data.union
-
-LEAF CONSUMERS (nothing imports them): data.build, features.descriptors, features.encoders, spine, splits.nested
+  19  contracts
+  14  config
+   7  metrics.point
+   4  data.standardize
+   4  dataset
+   4  models.mtl
