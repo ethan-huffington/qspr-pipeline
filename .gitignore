@@ -34,3 +34,6 @@ lightning_logs/
 
 # Local assistant instructions — kept out of the public repo.
 CLAUDE.md
+
+# Internal design brief — kept out of the public repo.
+qspr_project_brief.md

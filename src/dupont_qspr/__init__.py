@@ -3,9 +3,8 @@
 Predicts aqueous solubility, lipophilicity and melting point from SMILES, each with
 a calibrated prediction interval and an applicability-domain flag.
 
-See ``qspr_project_brief.md`` for the design, ``dupont_qspr.contracts`` for the
-interfaces the pipeline stages meet at, and ``experiments/run_pipeline.sh`` for the
-order the stages run in.
+See ``dupont_qspr.contracts`` for the interfaces the pipeline stages meet at, and
+``experiments/run_pipeline.sh`` for the order the stages run in.
 """
 
 from __future__ import annotations

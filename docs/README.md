@@ -1,7 +1,10 @@
-# Generated documentation
+# Documentation
 
-Everything here is regenerated from the source tree, not hand-maintained. Rerun
-the commands below after adding or moving a module.
+`REPORT.md` is the written results report for the full run: headline numbers,
+model selection, uncertainty, the low-data ablation, and limitations.
+
+Everything else here is regenerated from the source tree, not hand-maintained.
+Rerun the commands below after adding or moving a module.
 
 ## Module dependency graph
 

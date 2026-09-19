@@ -14,9 +14,14 @@ Each prediction comes with a **calibrated 90% prediction interval** and an
 training data closely enough for the interval to be trusted. The model ships as a
 versioned MLflow pyfunc.
 
-The design is fixed in [`qspr_project_brief.md`](qspr_project_brief.md). This
-README covers what was built, how to run it, and where the build departs from the
-brief.
+Intended use is high-volume batch scoring — screening a library, or feeding a
+downstream optimiser in-process — not a low-latency endpoint. Generation,
+multi-objective optimisation and synthesizability scoring are deliberately out of
+scope.
+
+The protocol was fixed before any modelling code was written, and the build ran in
+eleven reviewed steps. Full results and method detail are in
+[docs/REPORT.md](docs/REPORT.md).
 
 ---
 
@@ -171,15 +176,15 @@ records = model.predict(["CCO", "c1ccccc1O"])
 
 ---
 
-## Where it departs from the brief
+## Deliberate trade-offs
 
-These are deliberate, and each would be raised in a design review.
+Each of these was a considered choice, and each would come up in a design review.
 
-1. **One model family ships, not a per-property hybrid.** The brief allows a
-   different winner for each property. XGBoost and the transformer encoder cannot
-   share a process on this hardware, even when the encoder is loaded first, so
-   the artifact carries the family that wins the most properties. Per-property
-   winners are still reported.
+1. **One model family ships, not a per-property hybrid.** The intended design
+   allowed a different winner per property. XGBoost and the transformer encoder
+   cannot share a process on this hardware, even when the encoder is loaded first,
+   so the artifact carries the family that wins the most properties. Per-property
+   winners are still reported. Moot in the end: XGBoost won all three.
 2. **Family selection uses outer-fold scores.** This is a mild form of selection
    on held-out data. There are two candidates per property rather than fifty
    configurations, so the optimism is small, but it is not zero. Under a true
