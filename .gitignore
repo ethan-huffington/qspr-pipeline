@@ -31,3 +31,6 @@ artifacts/**
 wandb/
 mlruns/
 lightning_logs/
+
+# Local assistant instructions — kept out of the public repo.
+CLAUDE.md

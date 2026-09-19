@@ -1,14 +1,16 @@
 # Full: the profile whose numbers get reported.
 #
-# Sized for the M4 Mac mini (10 cores). The XGBoost nested run is
-# 5 outer x (100 trials x 3 inner + 1 refit) x 3 properties, which is the long
-# pole at roughly a few hours; Optuna pruning cuts a good fraction of that. The
-# neural track is minutes, since it fits small heads on cached embeddings.
+# Sized for the M4 Mac mini (10 cores). Measured end to end: 16 h 45 min, of
+# which the XGBoost nested run is 9.7 h, both neural encoders 3.2 h, the
+# uncertainty pass 1.3 h and the final fit 2.5 h. The XGBoost search is the long
+# pole by a wide margin and is where any budget cut should land.
 
 tuning:
-  # Sized from measured fit times (logS ~6s, logP ~4s, mp_K ~21s) rather than
-  # guessed. 50 trials x 3 inner folds x 3 properties x 5 outer folds, with
-  # pruning cutting roughly a third of the inner fits, lands near 3 hours.
-  # 100 trials would be ~6 hours for a search that has long since converged.
+  # MEASURED, after the fact: this stage took 9.7 hours, not the ~3 hours first
+  # projected from single fit times (logS ~6s, logP ~4s, mp_K ~21s). The
+  # projection assumed later trials cost what the early random ones did, but TPE
+  # converges on low learning rates that build far more trees before early
+  # stopping ends them, and the slowest single cell ran 69 minutes. Size any
+  # future budget from that 9.7 h, not from fit times.
   n_trials: 50
   pruning: true

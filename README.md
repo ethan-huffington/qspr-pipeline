@@ -30,22 +30,59 @@ $ uv run dupont-qspr --profile smoke "CC(=O)Oc1ccccc1C(=O)O" "not a molecule"
 {
   "smiles_canonical": "CC(=O)Oc1ccccc1C(=O)O",
   "predictions": {
-    "logS": {"value": -1.78, "lower": -6.00, "upper": 0.13, "nominal_coverage": 0.9},
-    "logP": {"value":  1.82, "lower":  0.16, "upper": 3.87, "nominal_coverage": 0.9},
-    "mp_K": {"value": 431.4, "lower": 257.1, "upper": 499.7, "nominal_coverage": 0.9}
+    "logS": {"value": -1.83, "lower":  -3.05, "upper":  -0.54, "nominal_coverage": 0.9},
+    "logP": {"value": -0.29, "lower":  -1.59, "upper":   1.74, "nominal_coverage": 0.9},
+    "mp_K": {"value": 393.4, "lower": 342.66, "upper": 467.96, "nominal_coverage": 0.9}
   },
-  "applicability_domain": {"nn_tanimoto_distance": 0.33, "in_domain": true},
-  "model_version": "xgb-smoke-1ed6346-20260914",
+  "applicability_domain": {"nn_tanimoto_distance": 0.0, "in_domain": true},
+  "model_version": "xgb-full-6190d22-20260915",
   "featurizer_version": "v1:rdkit-ecfp4"
 }
 {"smiles_input": "not a molecule", "error": "rejected: unparseable (not a molecule)", "predictions": null}
 ```
 
-The values above come from the `smoke` profile (500 molecules, 3 tuning trials),
-which exists to prove the pipeline end to end, so they are not meaningful
-predictions. Reported numbers come from the `full` profile only. A bad input
-produces an error record in its place, so one bad SMILES never costs the rest of
-the batch.
+A bad input produces an error record in its place, so one bad SMILES never costs
+the rest of the batch.
+
+---
+
+## Results
+
+From the reported `full` run: 29,404 molecules, 5 outer × 3 inner scaffold-disjoint
+folds, 50 Optuna trials per study. Every number below is scored on held-out folds.
+
+| Property | RMSE | RMSE ÷ SD | Spearman ρ | n |
+|---|---|---|---|---|
+| `logS` solubility | 0.97 ± 0.09 log units | **0.42** | 0.90 | 9,383 |
+| `logP` lipophilicity | 0.69 ± 0.05 log units | **0.57** | 0.81 | 4,200 |
+| `mp_K` melting point | 41.3 ± 1.6 K | **0.45** | 0.88 | 20,076 |
+
+RMSE ÷ SD is the number to read: 1.0 means no better than predicting the mean, and
+these sit comfortably below it. Melting point is the hardest of the three in
+relative terms, as expected of a property governed by crystal packing.
+
+**XGBoost won all three properties**, and the paired per-fold intervals excluded
+zero in every case, so nothing came down to the tie-break. The multi-task track
+reached 0.51 / 0.70 / 0.53 on the same folds. A shared representation over frozen
+embeddings did not beat descriptors plus fingerprints here.
+
+**The low-data ablation refutes the project's own hypothesis.** Multi-task was
+expected to win when labels are scarce. It lost at every size from 100 to 1,000
+labels per property, and for lipophilicity the gap widened as data grew
+(−0.06 at 100, −0.15 at 1,000). Reported as measured.
+
+**Intervals are calibrated but degrade with novelty.** Pooled coverage is 0.91
+against a nominal 0.90. Split by distance to the nearest training molecule, it runs
+0.94–0.95 for close analogues and 0.86–0.88 for the most novel decile — the exact
+failure a pooled number hides. The applicability-domain threshold is 0.617, which
+flags 13.5% of held-out molecules as out of domain.
+
+**There is headroom.** Replicate disagreement in the source data is a median of
+0.12 log units for solubility and 2 K for melting point, far below the errors
+above, so the limit here is the model rather than the measurements.
+
+Full detail: `artifacts/full/decision.json` and the figures in
+`artifacts/full/figures/`.
 
 ---
 
@@ -103,15 +140,18 @@ Every stage is its own script under `experiments/` and takes
 so a stage can be rerun alone. They must run as separate processes: XGBoost and
 PyTorch link different OpenMP runtimes and crash when loaded together.
 
-| Stage | Script | Full-profile cost |
+Wall-clock cost of the reported run, on an M4 Mac mini (10 cores):
+
+| Stage | Script | Cost |
 |---|---|---|
-| Data, features, folds | `01`–`03` | minutes (encoders embed about 1,750 molecules/s) |
-| XGBoost nested search | `04_nested_xgb.py` | ~3 h, measured |
-| Multi-task nested search, both encoders | `06_nested_mtl.py` | ~2 h, measured |
-| Conformal intervals + AD distances | `08_uncertainty.py` | ~40 min, measured |
+| Data, features, folds | `01`–`03` | seconds on warm caches; ~15 min cold |
+| XGBoost nested search | `04_nested_xgb.py` | 9.7 h |
+| Multi-task nested search, both encoders | `06_nested_mtl.py` | 3.2 h |
+| Conformal intervals + AD distances | `08_uncertainty.py` ×3 | 1.3 h |
 | Family choice, coverage by distance, AD threshold | `07_analyze.py` | seconds |
-| Low-data ablation | `10_ablation.py` | minutes, estimated from fit times |
-| Final search, calibration, MLflow registration | `11_final_fit.py` | ~1–2 h for XGBoost, estimated |
+| Low-data ablation | `10_ablation.py` | 4 min |
+| Final search, calibration, MLflow registration | `11_final_fit.py` | 2.5 h |
+| **Total** | `run_pipeline.sh full` | **16 h 45 min** |
 
 Tests run as **two invocations**, split on the same OpenMP boundary:
 
@@ -162,14 +202,24 @@ These are deliberate, and each would be raised in a design review.
 7. **ChemBERTa-2's tokenizer is broken** and reads `Cl` as `C` and `Br` as `B`.
    The model was pretrained that way, so the fix is not to patch the tokenizer
    but to cache a second encoder (`seyonec/PubChem10M_SMILES_BPE_450k`) with a
-   working one, and compare the two.
+   working one, and compare the two. Measured outcome: the broken-tokenizer
+   encoder scored *better* (RMSE ÷ SD 0.51 / 0.70 / 0.53 against 0.53 / 0.75 /
+   0.53), so halogen blindness was not what limited the neural track.
 
 ## Honest limitations
 
 - `logP` here is **logD at pH 7.4**, the quantity the Lipophilicity set measures.
   For ionisable molecules it differs from true logP.
-- Melting-point labels have replicate spreads of several kelvin. That spread
-  sets a floor on achievable error, and it is recorded rather than smoothed away.
+- **Intervals are weaker exactly where novelty is highest.** Coverage falls from
+  0.94–0.95 for close analogues to 0.86–0.88 in the most distant band. The
+  applicability-domain flag marks those molecules, but the interval itself does
+  not widen enough to keep its promise there.
+- **The ablation tested one encoder.** It used PubChem10M, which step 7 rated the
+  weaker of the two, so the multi-task result would be worth rechecking on
+  ChemBERTa-2 before treating it as settled.
+- Melting-point labels have replicate spreads of several kelvin (median 2 K;
+  0.12 log units for solubility). That sets a floor on achievable error, and the
+  errors above sit well clear of it — the limit here is the model, not the data.
 - A single benzene-ring scaffold group holds 21% of molecules, so one outer fold
   is unavoidably larger and richer in melting points. Fold-to-fold variation is
   reported, not hidden.
