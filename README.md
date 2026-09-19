@@ -1,4 +1,4 @@
-# dupont-qspr
+# QSPR Pipeline
 
 A small-molecule property predictor. Give it SMILES strings and it returns, for
 each molecule:
@@ -211,7 +211,7 @@ Each of these was a considered choice, and each would come up in a design review
    encoder scored *better* (RMSE ÷ SD 0.51 / 0.70 / 0.53 against 0.53 / 0.75 /
    0.53), so halogen blindness was not what limited the neural track.
 
-## Honest limitations
+## Limitations
 
 - `logP` here is **logD at pH 7.4**, the quantity the Lipophilicity set measures.
   For ionisable molecules it differs from true logP.
